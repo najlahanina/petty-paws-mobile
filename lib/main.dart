@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:petty_paws/menu.dart';
+import 'package:petty_paws/screens/menu.dart';
 
 void main() {
   runApp(const MyApp());
