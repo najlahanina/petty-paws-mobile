@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:petty_paws/screens/list_productentry.dart';
 import 'package:petty_paws/screens/menu.dart';
 import 'package:petty_paws/screens/productentry_form.dart';
 
@@ -52,16 +53,27 @@ class LeftDrawer extends StatelessWidget {
             ),
             ListTile(
               leading: const Icon(Icons.add_shopping_cart),
-              title: const Text('Tambah Item'),
+              title: const Text('Tambah Produk'),
               // Bagian redirection ke ProductEntryFormPage
               onTap: () {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => ProductEntryFormPage(),
+                    builder: (context) => const ProductEntryFormPage(),
                   ),
                 );
               },
+            ),
+            ListTile(
+                leading: const Icon(Icons.checklist),
+                title: const Text('Daftar Produk'),
+                onTap: () {
+                    // Route menu ke halaman product
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => const ProductEntryPage()),
+                    );
+                },
             ),
         ],
       ),
