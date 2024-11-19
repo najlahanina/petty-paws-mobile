@@ -442,8 +442,19 @@ Agar pengalaman pengguna lebih lancar, instance CookieRequest perlu dibagikan ke
 
 - Menghindari redudansi jika membuat beberapa instance CookieRequest, karena menyebabkan sesi tidak sinkron sehingga user harus login berkali-kali
 ## 4. Jelaskan mekanisme pengiriman data mulai dari input hingga dapat ditampilkan pada Flutter.
-1. 
+1. User mengirim form tambah product di flutter yang menggunakan TextFormField. Saat user mengetik, data disimpan di state widget melalui setState().
 
+2. Saat button save ditekan, form akan divalidasi dulu dan jika valid data tersebut akan dikonversi ke JSON lalu dikirim ke DJango dengan HTTP POST request menggunakan CookieRequest.
+
+3. Di Django, data JSON diterima, lalu data di deserialisasi dan digunakan untuk membuat instance Product. Setelah disimpan, Django akan mengirim response sukses ke Flutter.
+
+4. Flutter menampilkan pesan sukses dengan SnackBar dan mengarahkan user ke homepage.
+
+5. FutureBuilder di Flutter yang memanggil fungsi fetchProduct() untuk melakukan HTTP GET request ke endpoint /json/ di Django dan mengambil data produk. Django mengambil semua produk milik pengguna yang login, men-serialize data ke JSON, dan mengirimkannya ke Flutter.
+
+4. Flutter melakukan serialisasi data JSON menjadi list ProductEntry menggunakan model class.
+
+5. Selama fetching data, FutureBuilder menampilkan CircularProgressIndicator sebagai feedback visual. Jika data berhasil diambil, FutureBuilder merender GridView yang menampilkan produk. Selain itu, juga akan menampilkan pesan saat tidak ada data atau terjadi error. 
 ## 5. Jelaskan mekanisme autentikasi dari login, register, hingga logout. Mulai dari input data akun pada Flutter ke Django hingga selesainya proses autentikasi oleh Django dan tampilnya menu pada Flutter.
 **REGISTER:**
 Input data (username dan password) di Flutter dengan mengisi form registrasi. Selanjutnya, flutter akan mengirim data ke endpoint register di server Django melalui POST request. Di Django, endpoint register menerima data, lalu melakukan validasi. Jika validasi berhasil, Django membuat akun baru dan menyimpan data pengguna di database. Django mengembalikan respons sukses ke Flutter. Terakhir, Flutter memeriksa respons yang diterima dari Django. Jika sukses, Flutter dapat menampilkan pesan berhasil atau mengalihkan pengguna ke halaman login.
@@ -1256,3 +1267,29 @@ itemBuilder: (_, index) => GestureDetector(
   ),
 ```
 #### Melakukan filter pada halaman daftar item dengan hanya menampilkan item yang terasosiasi dengan pengguna yang login.
+1. Menggunakan fungsi show_xml dan show_json yang ada di main/views.py pada Django app. Kedua fungsi tersebut menggunakan filter request user untuk memfilter objek produk sehingga hanya menampilkan data yang dimiliki oleh user yang sedang login tersebut.
+
+2. Menggunakan decorator @login_required pada fungsi show_main di Django untuk memastikan hanya user login yang bisa mengakses data.
+
+3. Mengasosiasikan antara Flutter dan Django saat membuat produk dengan menambahkan fungsi create_product_flutter pada main/views.py di Django seperti berikut:
+```python
+@csrf_exempt
+def create_product_flutter(request):
+    if request.method == 'POST':
+
+        data = json.loads(request.body)
+        new_product = Product.objects.create(
+            user=request.user,
+            name=data["name"],
+            brands=data["brands"],
+            price=int(data["price"]),
+            categories=data["categories"],
+            description=data["description"],
+        )
+
+        new_product.save()
+
+        return JsonResponse({"status": "success"}, status=200)
+    else:
+        return JsonResponse({"status": "error"}, status=401)
+```

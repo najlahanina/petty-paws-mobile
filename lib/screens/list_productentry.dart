@@ -13,13 +13,13 @@ class ProductEntryPage extends StatefulWidget {
 }
 
 class _ProductEntryPageState extends State<ProductEntryPage> {
-  Future<List<ProductEntry>> fetchMood(CookieRequest request) async {
+  Future<List<ProductEntry>> fetchProduct(CookieRequest request) async {
     final response = await request.get('http://localhost:8000/json/');
     
     // Melakukan decode response menjadi bentuk json
     var data = response;
     
-    // Melakukan konversi data json menjadi object MoodEntry
+    // Melakukan konversi data json menjadi object ProductEntry
     List<ProductEntry> listProduct = [];
     for (var d in data) {
       if (d != null) {
@@ -38,7 +38,7 @@ class _ProductEntryPageState extends State<ProductEntryPage> {
       ),
       drawer: const LeftDrawer(),
       body: FutureBuilder(
-        future: fetchMood(request),
+        future: fetchProduct(request),
         builder: (context, AsyncSnapshot snapshot) {
           if (snapshot.data == null) {
             return const Center(child: CircularProgressIndicator());
